@@ -39,14 +39,22 @@ public:
     void pop() override {};
 
     type_t size() const {
-        return _size;
+        return _container.size();
     };
 
 private:
-    type_t _i
+    type_t _i_left(type_t i) {
+        return 2 * i;
+    };
+    type_t _i_right(type_t i) {
+        return 2 *i + 1;
+    };
+    type_t _i_parent(type_t i) {
+        return i / 2;
+    };
 
 private:
-    type_t _size;
+    vector<T> _container;
 
 };
 
