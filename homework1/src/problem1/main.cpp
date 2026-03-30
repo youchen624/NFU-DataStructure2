@@ -18,17 +18,17 @@ template <class T>
 class MinPQ {
 public:
     virtual ~MinPQ() {};
-    virtual bool empty() {} const = 0;
+    virtual bool empty() const = 0;
     virtual const T& top() const = 0;
     virtual void push(const T&) = 0;
     virtual void pop() = 0;
 };
 
 template <class T>
-class MinHeap : public MinPQ {
+class MinHeap : public MinPQ<T> {
 public:
     MinHeap() {
-        _container.push_back(T);
+        _ct.push_back(T());
     };
     ~MinHeap() {};
 
@@ -37,51 +37,63 @@ public:
     };
 
     const T& top() const override {
-        if (empty()) throw new std::out_of_range("heap is empty");
-        return _container[1];
+        if (empty()) throw std::out_of_range("heap is empty");
+        return _ct[1];
     };
 
     void push(const T& obj) override {
-        _container.push_back(obj);
+        _ct.push_back(obj);
         _sift_up(size() - 1);
     };
 
     void pop() override {
         if (empty()) return;
-        _container[1] = _container.back();
-        _container.pop_back();
+        _ct[1] = _ct.back();
+        _ct.pop_back();
         if (empty()) return;
         _sift_down(1);
     };
 
-    type_t size() const {
-        return _container.size() - 1;
+    size_t size() const {
+        return _ct.size() - 1;
     };
 
 private:
     // index getter
-    type_t _i_left(type_t i) {
+    size_t _i_left(size_t i) {
         return 2 * i;
     };
-    type_t _i_right(type_t i) {
+    size_t _i_right(size_t i) {
         return 2 *i + 1;
     };
-    type_t _i_parent(type_t i) {
+    size_t _i_parent(size_t i) {
         return i / 2;
     };
 
     // sift er
-    void _sift_up(type_t i) {
-        while (i > 1 && _container[i] < _container[_i_parent(i)]) {
-            std::swap(_container[i], _container[_i_parent(i)]);
+    void _sift_up(size_t i) {
+        while (i > 1 && _ct[i] < _ct[_i_parent(i)]) {
+            std::swap(_ct[i], _ct[_i_parent(i)]);
             i /= 2;
         }
     };
-    void _sift_down(type_t i) {
+    void _sift_down(size_t i) {
+        while (_i_left(i) <= size()) {
+            size_t min = _i_left(i);
+
+            if (_i_right(i) <= size() && _ct[_i_right(i)] < _ct[_i_left(i)]) {
+                min = _i_right(i);
+            }
+
+            if (_ct[i] <= _ct[min]) break;
+
+            std::swap(_ct[i], _ct[min]);
+            i = min;
+        }
     };
 
 private:
-    vector<T> _container;
+    vector<T> _ct;
 
 };
 
