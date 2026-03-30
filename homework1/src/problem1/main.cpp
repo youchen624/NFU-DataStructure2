@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 
@@ -26,23 +27,39 @@ public:
 template <class T>
 class MinHeap : public MinPQ {
 public:
+    MinHeap() {
+        _container.push_back(T);
+    };
     ~MinHeap() {};
 
     bool empty() const override {
-        return !_size;
+        return !size();
     };
 
-    const T& top() const override {};
+    const T& top() const override {
+        if (empty()) throw new std::out_of_range("heap is empty");
+        return _container[1];
+    };
 
-    void push(const T& obj) override {};
+    void push(const T& obj) override {
+        _container.push_back(obj);
+        _sift_up(size() - 1);
+    };
 
-    void pop() override {};
+    void pop() override {
+        if (empty()) return;
+        _container[1] = _container.back();
+        _container.pop_back();
+        if (empty()) return;
+        _sift_down(1);
+    };
 
     type_t size() const {
-        return _container.size();
+        return _container.size() - 1;
     };
 
 private:
+    // index getter
     type_t _i_left(type_t i) {
         return 2 * i;
     };
@@ -52,6 +69,10 @@ private:
     type_t _i_parent(type_t i) {
         return i / 2;
     };
+
+    // sift er
+    void _sift_up(type_t i) {};
+    void _sift_down(type_t i) {};
 
 private:
     vector<T> _container;
