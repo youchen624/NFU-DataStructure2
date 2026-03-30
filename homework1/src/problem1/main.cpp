@@ -97,6 +97,42 @@ private:
 
 };
 
+
+
 int main() {
+    try {
+        MinHeap<int> min_heap;
+
+        int a[] = {5, 3, 8, 1, 2};
+        cout << "Test push: [5, 3, 8, 1, 2]" << endl;
+        for (auto &v : a) {
+            min_heap.push(v);
+        }
+
+        cout << "Test top:" << min_heap.top() << endl;
+        cout << "Test size:" << min_heap.size() << endl;
+
+        cout << "\nTest L<R:" << endl;
+        // 1, 2, 3, 5, 8
+        while (!min_heap.empty()) {
+            cout << min_heap.top() << " ";
+            min_heap.pop();
+        }
+        cout << endl;
+
+        cout << "Test is empty:" << endl;
+        if (min_heap.empty()) {
+            cout << "Heap is empty" << endl;
+        }
+
+        cout << "top= " << endl;
+        cout << min_heap.top() << endl;
+
+    } catch (const std::out_of_range& e) {
+        cout << "Catch error -- " << e.what() << endl;
+    } catch (const std::exception& e) {
+        cout << "other error -- " << e.what() << endl;
+    }
+
     return 0;
 }
