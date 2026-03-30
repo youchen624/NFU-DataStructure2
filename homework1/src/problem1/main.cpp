@@ -71,8 +71,14 @@ private:
     };
 
     // sift er
-    void _sift_up(type_t i) {};
-    void _sift_down(type_t i) {};
+    void _sift_up(type_t i) {
+        while (i > 1 && _container[i] < _container[_i_parent(i)]) {
+            std::swap(_container[i], _container[_i_parent(i)]);
+            i /= 2;
+        }
+    };
+    void _sift_down(type_t i) {
+    };
 
 private:
     vector<T> _container;
