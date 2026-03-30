@@ -158,6 +158,13 @@ void _sift_down(size_t i) {
 
 ### 1.3 效能分析
 
+| method | AVG/worst |
+| - | - |
+| $push(T)$ | $O(log(n))$ |
+| $pop()$ | $O(log(n))$ |
+| $top()$ | $O(1)$ |
+| $size()$ | $O(1)$ |
+
 ### 1.4 測試與驗證
 
 #### 1.4.1 測試案例
