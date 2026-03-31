@@ -216,21 +216,285 @@ int main() {
 
 #### 2.1.1 解題策略
 
+撰寫BST，並進行測試。
+未說明使用類型，因此預設使用`double`，也可有效避免重複。
+刪除策略: 使用In-Order找最大堆當中最小值。
+
 ### 2.2 程式實作
+
+其中使用指標來儲存BST，提高效率(相較陣列)。
+
+使用`_search(T)`，查找回傳一對資料(`{ 父, 目標}`)。
+
+```cpp
+#include <iostream>
+#include <cmath>
+#include <random>
+// #include <limits>
+
+using namespace std;
+
+template <class T>
+class BST {         // left < right
+private:
+    class Node{
+    public:
+        T v;
+        Node* left;
+        Node* right;
+        Node(T obj) : v(obj), left(nullptr), right(nullptr) {};
+    };
+
+    using PNode = std::pair<Node*, Node*>;
+    /*using V3Node = struct {
+        Node* parent;
+        Node* target;
+    };*/
+
+public:
+    BST() : _root(nullptr), _size(0) {};
+    ~BST() { _clear(_root); };
+
+    void push(T obj) {
+        if (!_root) {
+            _root = new Node(obj);
+            ++_size;
+        } else {
+            Node* ptr = _root;
+            while (true) {
+                if (ptr->v == obj) return;  // repeat item not allowed
+                if (ptr->v > obj) {
+                    if (!ptr->left) {
+                        ptr->left = new Node(obj);
+                        ++_size;
+                        return;
+                    }
+                    else ptr = ptr->left;
+                } else {// <
+                    if (!ptr->right) {
+                        ptr->right = new Node(obj);
+                        ++_size;
+                        return;
+                    }
+                    else ptr = ptr->right;
+                }
+            }
+        }
+    };
+
+    size_t height() const {
+        return _get_height(_root);
+    };
+
+    size_t size() const {
+        return _size;
+    };
+
+    size_t empty() const {
+        return !size();
+    };
+
+    void remove(T obj) {
+         // do nothing if it is not exist
+        if (empty()) return;
+        PNode p2ptr = _search(obj);
+        Node* dp = p2ptr.second;
+        Node* tmp = nullptr, tmp2 = p2ptr.second;
+        if (!p2ptr.second) {
+            return; // not exist
+        // } else if (!p2ptr.first) {
+        //     _root = nullptr;
+        } else if (p2ptr.second->right) {
+            tmp = p2ptr.second->right;
+            tmp2 = p2ptr.second;
+            while (tmp->left) {
+                tmp2 = tmp;
+                tmp = tmp->left;
+            }
+
+            if (tmp2 != p2ptr.second) {
+                tmp2->left = tmp->right;
+                tmp->right = p2ptr.second->right;
+            }
+
+            tmp->left = p2ptr.second->left;
+
+            (p2ptr.first) ? ((p2ptr.first->right == p2ptr.second) ? p2ptr.first->right : p2ptr.first->left) : (_root) = tmp;
+
+        } else if (p2ptr.second->left) {
+            (p2ptr.first) ? ((p2ptr.first->right == p2ptr.second) ? p2ptr.first->right : p2ptr.first->left) : (_root) = p2ptr.second->left;
+        } else {
+            (p2ptr.first) ? ((p2ptr.first->right == p2ptr.second) ? p2ptr.first->right : p2ptr.first->left) : (_root) = nullptr;
+        }
+            delete dp;
+            --_size;
+    };
+
+private:
+    Node* _root;
+    size_t _size;
+
+    size_t _get_height(Node* node) const {
+        if (node == nullptr)
+            return 0;
+        else
+            return 1 + std::max(_get_height(node->right), _get_height(node->left));
+    };
+
+    PNode _search(T obj) {
+        // returns nullptr if not exist
+        // {parent, target}
+        Node* pptr = nullptr;
+        Node* ptr = _root;
+        while (ptr && ptr->v != obj) {
+            pptr = ptr;
+            if (ptr->v < obj) ptr = ptr->right;
+            else ptr = ptr->left;
+        }
+        return {pptr, ptr};
+    };
+
+    void _clear(Node* node) {
+        if (node == nullptr) return;
+        _clear(node->right);
+        _clear(node->left);
+        delete node;
+    };
+};
+
+int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis;
+    
+    int test[] = {100, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
+    for (auto n : test) {
+        double d = log2(n);
+        BST<double> bst;
+        
+        int count = n;
+        while (count--) {
+            double val = dis(gen);
+            bst.push(val);
+        }
+        cout << "height/log2(" << n << ") = " << bst.height() / d << endl;
+    }
+}
+
+/*
+int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis;
+    int n = 100, m = 100;
+    BST<double> bst;
+    vector<double> list;
+    while (n--) {
+        double val = dis(gen);
+        bst.push(val);
+        list.push_back(val);
+    }
+    cout << "height/log2(n) = " << bst.height() / log2(100) << endl;
+    while (m--) {
+        if (!list.empty()) {
+            std::uniform_int_distribution<> dis(0, list.size() - 1);
+            int index = dis(gen);
+            double pickedValue = list[index];
+            std::cout << "取出的值: " << pickedValue << std::endl;
+            std::swap(list[index], list.back());
+            list.pop_back();
+        }
+    }
+}
+*/
+```
 
 ### 2.3 效能分析
 
+`remove(T)`時間複雜度: $O(h)$，$h$=Tree高度。
+
 ### 2.4 測試與驗證
 
-#### 2.4.1 測試案例
+![高度曲線圖](../.img/BST%20Height%20Analysis%2020260331.png)
 
-#### 2.4.2 執行指令
+```cpp
+int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis;
+    
+    int test[] = {100, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
+    for (auto n : test) {
+        double d = log2(n);
+        BST<double> bst;
+        
+        int count = n;
+        while (count--) {
+            double val = dis(gen);
+            bst.push(val);
+        }
+        cout << "height/log2(n) = " << bst.height() / d << endl;
+    }
+}
+```
 
-#### 2.4.3 結論
+```txt
+height/log2(100) = 1.80618
+height/log2(500) = 1.8961
+height/log2(1000) = 2.10721
+height/log2(2000) = 2.18863
+height/log2(3000) = 2.33751
+height/log2(4000) = 2.25643
+height/log2(5000) = 2.60423
+height/log2(6000) = 2.3903
+height/log2(7000) = 2.42697
+height/log2(8000) = 2.46803
+height/log2(9000) = 2.13159
+height/log2(10000) = 2.03195
+```
+
+據觀察，約為$1.8~2.6$。
+
+RND節點：
+
+```cpp
+int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis;
+    int n = 100, m = 100;
+    BST<double> bst;
+    vector<double> list;
+    while (n--) {
+        double val = dis(gen);
+        bst.push(val);
+        list.push_back(val);
+    }
+    cout << "height/log2(n) = " << bst.height() / log2(100) << endl;
+    while (m--) {
+        if (!list.empty()) {
+            std::uniform_int_distribution<> dis(0, list.size() - 1);
+            int index = dis(gen);
+            double pickedValue = list[index];
+            std::cout << "取出的值: " << pickedValue << std::endl;
+            std::swap(list[index], list.back());
+            list.pop_back();
+        }
+    }
+}
+```
+
+#### 2.4.1 結論
+
+大致上穩定，BST在隨機中夠平衡，刪除method正常。
 
 ### 2.5 申論與開發報告
 
 #### 2.5.1 設計的過程
+
+最麻煩的在於刪除方法，沒有過多的優化邏輯，只單純的把邏輯一行一行加上去，有點死板。
+
+不過有注意到BST有機率出現最差狀況，整棵樹傾斜的狀況，例如存入一段等差級數。
 
 ## 程式實作
 

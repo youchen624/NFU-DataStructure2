@@ -24,13 +24,11 @@ private:
 
 public:
     BST() : _root(nullptr), _size(0) {};
-    ~BST() { _clear(_root); };
+    ~BST() { _clear(); };
 
     void push(T obj) {
-        if (!_root) {
-            _root = new Node(obj);
-            ++_size;
-        } else {
+        if (!_root) _root = new Node(obj);
+        else {
             Node* ptr = _root;
             while (true) {
                 if (ptr->v == obj) return;  // repeat item not allowed
@@ -58,7 +56,7 @@ public:
     };
 
     size_t size() const {
-        return _size;
+        return _size();
     };
 
     size_t empty() const {
@@ -92,6 +90,20 @@ public:
 
             (p2ptr.first) ? ((p2ptr.first->right == p2ptr.second) ? p2ptr.first->right : p2ptr.first->left) : (_root) = tmp;
 
+            /*else if (p2ptr.second->right) {
+            tmp = p2ptr.second->right;
+            while (tmp->left) {
+                tmp2 = tmp;
+                tmp = tmp->left;
+            }
+            if (tmp->right) tmp2->left = tmp->right;        // ㄑ
+            else tmp2->left = nullptr;                          //   /
+            tmp->right = p2ptr.second->right;
+            tmp->left = p2ptr.second->left;
+
+            (p2ptr.first) ? ((p2ptr.first->right == p2ptr.second) ? p2ptr.first->right : p2ptr.first->left) : (_root)= tmp;*/
+
+            //p2ptr.second = p2ptr.second->left;
         } else if (p2ptr.second->left) {
             (p2ptr.first) ? ((p2ptr.first->right == p2ptr.second) ? p2ptr.first->right : p2ptr.first->left) : (_root) = p2ptr.second->left;
         } else {
@@ -137,44 +149,15 @@ int main() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dis;
-    
+
     int test[] = {100, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
-    for (auto n : test) {
-        double d = log2(n);
+    for (auto &v : test) {
+        double d = log2(v);
         BST<double> bst;
-        
-        int count = n;
-        while (count--) {
+        while (v--) {
             double val = dis(gen);
             bst.push(val);
-        }
-        cout << "height/log2(" << n << ") = " << bst.height() / d << endl;
+        };
+        cout << "height/log2(n) = " << bst.height() / d << endl;
     }
 }
-
-/*
-int main() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dis;
-    int n = 100, m = 100;
-    BST<double> bst;
-    vector<double> list;
-    while (n--) {
-        double val = dis(gen);
-        bst.push(val);
-        list.push_back(val);
-    }
-    cout << "height/log2(n) = " << bst.height() / log2(100) << endl;
-    while (m--) {
-        if (!list.empty()) {
-            std::uniform_int_distribution<> dis(0, list.size() - 1);
-            int index = dis(gen);
-            double pickedValue = list[index];
-            std::cout << "取出的值: " << pickedValue << std::endl;
-            std::swap(list[index], list.back());
-            list.pop_back();
-        }
-    }
-}
-*/
