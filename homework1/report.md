@@ -149,7 +149,8 @@ void _sift_down(size_t i) {
         size_t min = _i_left(i);
         if (_i_right(i) <= size() && _ct[_i_right(i)] < _ct[_i_left(i)]) {
             min = _i_right(i);
-        } (_ct[i] <= _ct[min]) break;
+        }
+        if (_ct[i] <= _ct[min]) break;
         std::swap(_ct[i], _ct[min]);
         i = min;
     }
